@@ -20,6 +20,10 @@ function Dashboard() {
     fetchAccounts();
   }, [userId]);
 
+  const handleLogout = () => {
+    navigate("/");
+  };
+
   return (
     <div style={{ padding: "2rem" }}>
       <h1>Dashboard</h1>
@@ -27,6 +31,10 @@ function Dashboard() {
 
       <button onClick={() => navigate(`/transfer/${userId}`)}>
         Go to Transfer Page
+      </button>
+
+      <button onClick={handleLogout} style={{ marginLeft: "1rem" }}>
+        Logout
       </button>
 
       <h3 style={{ marginTop: "2rem" }}>Accounts</h3>

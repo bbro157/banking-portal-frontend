@@ -7,26 +7,30 @@ function LoginPage() {
   const [users, setUsers] = useState([]);
   const navigate = useNavigate();
 
-  const handleLogin = async () => {
-    try {
-      const response = await API.get("/users");
-      const foundUsers = response.data;
-      setUsers(foundUsers);
+const handleLogin = async () => {
+  try {
+    const response = await API.get("/users");
+    const foundUsers = response.data;
+    setUsers(foundUsers);
 
-      const matchedUser = foundUsers.find(
-        (user) => user[1].toLowerCase() === username.toLowerCase()
-      );
+    const matchedUser = foundUsers.find(
+      (user) => user[1].toLowerCase() === username.toLowerCase()
+    );
 
-      if (matchedUser) {
-        navigate(`/dashboard/${matchedUser[0]}`);
+    if (matchedUser) {
+      if (matchedUser[3] === true) {
+        navigate("/admin");
       } else {
-        alert("User not found");
+        navigate(`/dashboard/${matchedUser[0]}`);
       }
-    } catch (error) {
-      console.error("Login error:", error);
-      alert("Could not connect to backend");
+    } else {
+      alert("User not found");
     }
-  };
+  } catch (error) {
+    console.error("Login error:", error);
+    alert("Could not connect to backend");
+  }
+};
 
   return (
     <div style={{ padding: "2rem" }}>
@@ -39,6 +43,10 @@ function LoginPage() {
         style={{ marginRight: "1rem", padding: "0.5rem" }}
       />
       <button onClick={handleLogin}>Login</button>
+
+      <button onClick={() => navigate("/register")}>
+      Create New Account
+      </button>
 
       <div style={{ marginTop: "2rem" }}>
         <h3>Demo Users</h3>
