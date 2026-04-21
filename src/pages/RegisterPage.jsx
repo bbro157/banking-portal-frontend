@@ -7,22 +7,24 @@ function RegisterPage() {
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [message, setMessage] = useState("");
-
   const navigate = useNavigate();
 
   const handleRegister = async (e) => {
     e.preventDefault();
 
     try {
-      const response = await API.post("/register", {
+      const response = await API.post("/signup", {
         username,
         password,
         full_name: fullName,
+        is_admin: false,
       });
 
       setMessage(response.data.message);
+      alert("Account created successfully");
       navigate("/");
     } catch (error) {
+      console.error("Signup error:", error);
       setMessage(error.response?.data?.detail || "Registration failed");
     }
   };

@@ -6,6 +6,9 @@ function Dashboard() {
   const { userId } = useParams();
   const navigate = useNavigate();
   const [accounts, setAccounts] = useState([]);
+  const [searchAccountId, setSearchAccountId] = useState("");
+  const [transactions, setTransactions] = useState([]);
+  const [message, setMessage] = useState("");
 
   useEffect(() => {
     const fetchAccounts = async () => {
@@ -20,8 +23,31 @@ function Dashboard() {
     fetchAccounts();
   }, [userId]);
 
-  const handleLogout = () => {
-    navigate("/");
+ const handleLogout = () => {
+  localStorage.removeItem("token"); // remove JWT
+  navigate("/");
+};
+
+  const handleSearchTransactions = async () => {
+    setMessage("");
+    setTransactions([]);
+
+    if (!searchAccountId) {
+      setMessage("Please enter an account ID.");
+      return;
+    }
+
+    try {
+      const response = await API.get(`/transactions/${searchAccountId}`);
+      setTransactions(response.data);
+
+      if (response.data.length === 0) {
+        setMessage("No transactions found for that account.");
+      }
+    } catch (error) {
+      console.error("Error fetching transactions:", error);
+      setMessage("Could not fetch transactions.");
+    }
   };
 
   return (
@@ -44,11 +70,35 @@ function Dashboard() {
         <ul>
           {accounts.map((account) => (
             <li key={account[0]}>
-              <strong>{account[1]}</strong> | Balance: ${account[2]} | Account #:{" "}
-              {account[3]}
+              <strong>{account[1]}</strong> | Account ID: {account[0]} | Balance: ${account[2]} | Account #: {account[3]}
             </li>
           ))}
         </ul>
+      )}
+
+      <h3 style={{ marginTop: "2rem" }}>Search Transactions by Account ID</h3>
+      <input
+        type="text"
+        placeholder="Enter any account ID"
+        value={searchAccountId}
+        onChange={(e) => setSearchAccountId(e.target.value)}
+        style={{ marginRight: "1rem", padding: "0.5rem" }}
+      />
+      <button onClick={handleSearchTransactions}>Search</button>
+
+      {message && <p style={{ marginTop: "1rem" }}>{message}</p>}
+
+      {transactions.length > 0 && (
+        <div style={{ marginTop: "2rem" }}>
+          <h3>Transactions</h3>
+          <ul>
+            {transactions.map((transaction) => (
+              <li key={transaction[0]}>
+                Transaction ID: {transaction[0]} | From: {String(transaction[1])} | To: {String(transaction[2])} | Amount: ${transaction[3]} | Type: {transaction[4]} | Date: {String(transaction[5])}
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
     </div>
   );
